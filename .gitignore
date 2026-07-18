@@ -1,0 +1,8 @@
+# runtime artifacts — not committed
+warehouse.db
+reports/
+__pycache__/
+*.pyc
+_verify*.py
+_inspect*.py
+.env

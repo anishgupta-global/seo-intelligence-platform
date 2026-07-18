@@ -1,0 +1,39 @@
+name: SEO Audit
+
+# Runs on a schedule (free on GitHub Actions) + on-demand via the "Run workflow" button.
+on:
+  schedule:
+    - cron: "0 6 * * *"          # daily at 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Site to audit"
+        default: "https://anishgupta.eu"
+        required: false
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Zero pip dependencies (stdlib only) — nothing to install.
+      - name: Run SEO audit (emails results in live mode)
+        env:
+          EMAIL_FROM:        ${{ secrets.EMAIL_FROM }}
+          EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+          EMAIL_TO:          ${{ secrets.EMAIL_TO }}
+          CLAUDE_API_KEY:    ${{ secrets.CLAUDE_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python run_audit.py "${{ github.event.inputs.url || 'https://anishgupta.eu' }}" --max-pages 100
+
+      # Keep the HTML/JSON/MD report as a downloadable artifact of each run.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seo-report
+          path: reports/
+          if-no-files-found: warn
