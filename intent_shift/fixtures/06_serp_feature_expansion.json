@@ -1,0 +1,25 @@
+{
+  "scenario": "More ads + a shopping pack pushed organic down — SERP layout changed, not our page",
+  "expected_issue_type": "serp_feature_expansion",
+  "domain": "client.com",
+  "page": "https://client.com/project-management-software",
+  "keyword": "best project management software",
+  "old_position": 2,
+  "new_position": 9,
+  "checked_at": "2026-07-18",
+  "our_page": {"status": 200, "indexable": true, "canonical_self": true, "robots": "index,follow", "word_count": 1400, "last_updated": "2026-06-25"},
+  "old_features": {"ai_overview": false, "ads": 2, "video": false, "shopping": false},
+  "new_features": {"ai_overview": false, "ads": 4, "video": false, "shopping": true},
+  "old_serp": [
+    {"position": 1, "url": "https://asana.com/pm", "title": "Project Management Software", "type": "software_landing_page"},
+    {"position": 2, "url": "https://client.com/project-management-software", "title": "Client PM Software", "type": "software_landing_page"},
+    {"position": 3, "url": "https://monday.com/pm", "title": "monday.com Project Management", "type": "software_landing_page"},
+    {"position": 4, "url": "https://clickup.com/pm", "title": "ClickUp Project Management", "type": "software_landing_page"}
+  ],
+  "new_serp": [
+    {"position": 1, "url": "https://asana.com/pm", "title": "Project Management Software", "type": "software_landing_page"},
+    {"position": 2, "url": "https://monday.com/pm", "title": "monday.com Project Management", "type": "software_landing_page"},
+    {"position": 3, "url": "https://clickup.com/pm", "title": "ClickUp Project Management", "type": "software_landing_page"},
+    {"position": 9, "url": "https://client.com/project-management-software", "title": "Client PM Software", "type": "software_landing_page"}
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "scenario": "SERP format unchanged (still software landing pages) but competitors are fresher/deeper — our page is stale",
+  "expected_issue_type": "content_decay",
+  "domain": "client.com",
+  "page": "https://client.com/project-management-software",
+  "keyword": "best project management software",
+  "old_position": 2,
+  "new_position": 9,
+  "checked_at": "2026-07-18",
+  "our_page": {"status": 200, "indexable": true, "canonical_self": true, "robots": "index,follow", "word_count": 420, "last_updated": "2024-02-10"},
+  "old_features": {"ai_overview": false, "ads": 2, "video": false, "shopping": false},
+  "new_features": {"ai_overview": false, "ads": 2, "video": false, "shopping": false},
+  "old_serp": [
+    {"position": 1, "url": "https://asana.com/pm", "title": "Project Management Software", "type": "software_landing_page"},
+    {"position": 2, "url": "https://client.com/project-management-software", "title": "Client PM Software", "type": "software_landing_page"},
+    {"position": 3, "url": "https://monday.com/pm", "title": "monday.com Project Management", "type": "software_landing_page"},
+    {"position": 4, "url": "https://clickup.com/pm", "title": "ClickUp Project Management", "type": "software_landing_page"},
+    {"position": 5, "url": "https://g2.com/best-pm", "title": "Best PM Tools", "type": "listicle"}
+  ],
+  "new_serp": [
+    {"position": 1, "url": "https://monday.com/pm", "title": "monday.com Project Management (2026 refresh)", "type": "software_landing_page"},
+    {"position": 2, "url": "https://asana.com/pm", "title": "Asana Project Management — Updated", "type": "software_landing_page"},
+    {"position": 3, "url": "https://clickup.com/pm", "title": "ClickUp Project Management 3.0", "type": "software_landing_page"},
+    {"position": 4, "url": "https://wrike.com/pm", "title": "Wrike Project Management", "type": "software_landing_page"},
+    {"position": 5, "url": "https://g2.com/best-pm", "title": "Best PM Tools", "type": "listicle"},
+    {"position": 9, "url": "https://client.com/project-management-software", "title": "Client PM Software", "type": "software_landing_page"}
+  ]
+}
