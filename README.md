@@ -54,15 +54,19 @@ Alerts are priority-routed (P0 instant, P1/P2 batched) through the Surface layer
   (override `SMTP_HOST`/`SMTP_PORT` for non-Gmail). Sends a formatted HTML report; dry-runs otherwise.
 
 ## Hosting (free, automatic)
-`.github/workflows/audit.yml` runs the audit on a **daily cron** (and on-demand via *Run workflow*)
-on **GitHub Actions** — free for a public repo, zero dependencies to install. Add your keys as repo
-**Actions secrets** (`EMAIL_FROM`, `EMAIL_APP_PASSWORD`, `EMAIL_TO`, optional `CLAUDE_API_KEY`,
-`SLACK_WEBHOOK_URL`) and it emails you the results on schedule.
+`.github/workflows/audit.yml` runs on **GitHub Actions** — free (private repos get 2,000 min/month;
+each run is ~1–2 min). It audits **both `anishgupta.eu` and `www.yoyaba.com` daily at 17:45
+Europe/Berlin** (DST-aware via a timezone gate), and on-demand via *Run workflow*. Zero dependencies
+to install. Add your keys as repo **Actions secrets** (`EMAIL_FROM`, `EMAIL_APP_PASSWORD`, `EMAIL_TO`,
+optional `CLAUDE_API_KEY`, `SLACK_WEBHOOK_URL`) and it emails you the results on schedule.
 
 ```bash
-# publish (one-time)
-git init && git add . && git commit -m "SEO Intelligence Platform"
-gh repo create seo-intelligence-platform --public --source=. --push
+# publish (one-time) — private repo
+gh auth login
+gh repo create seo-intelligence-platform --private --source=. --push
+gh secret set EMAIL_FROM --body "you@gmail.com"
+gh secret set EMAIL_APP_PASSWORD --body "your-app-password"
+gh secret set EMAIL_TO --body "you@gmail.com"
 ```
 
 ## License

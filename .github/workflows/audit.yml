@@ -1,19 +1,24 @@
 name: SEO Audit
 
-# Runs on a schedule (free on GitHub Actions) + on-demand via the "Run workflow" button.
+# Scheduled daily at 17:45 Europe/Berlin. GitHub Actions cron is UTC-only and has no
+# timezone option, so we fire at BOTH 15:45 and 16:45 UTC and let a timezone gate run
+# the audit only when it is 17:xx in Berlin. That lands on 17:45 Berlin all year,
+# handling CEST (summer, UTC+2) and CET (winter, UTC+1) automatically.
 on:
   schedule:
-    - cron: "0 6 * * *"          # daily at 06:00 UTC
-  workflow_dispatch:
-    inputs:
-      url:
-        description: "Site to audit"
-        default: "https://anishgupta.eu"
-        required: false
+    - cron: "45 15 * * *"     # 17:45 Berlin during CEST (summer)
+    - cron: "45 16 * * *"     # 17:45 Berlin during CET  (winter)
+  workflow_dispatch:            # manual "Run workflow" button — audits both sites now
 
 jobs:
   audit:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        site:
+          - "https://anishgupta.eu"
+          - "https://www.yoyaba.com"
     steps:
       - uses: actions/checkout@v4
 
@@ -21,19 +26,36 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Berlin-time gate (DST-aware)
+        id: gate
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then
+            echo "proceed=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          H=$(TZ=Europe/Berlin date +%H)
+          echo "Berlin hour = $H"
+          if [ "$H" = "17" ]; then
+            echo "proceed=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            echo "Not 17:xx Berlin — skipping this UTC firing."
+          fi
+
       # Zero pip dependencies (stdlib only) — nothing to install.
       - name: Run SEO audit (emails results in live mode)
+        if: steps.gate.outputs.proceed == 'true'
         env:
-          EMAIL_FROM:        ${{ secrets.EMAIL_FROM }}
+          EMAIL_FROM:         ${{ secrets.EMAIL_FROM }}
           EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
-          EMAIL_TO:          ${{ secrets.EMAIL_TO }}
-          CLAUDE_API_KEY:    ${{ secrets.CLAUDE_API_KEY }}
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: python run_audit.py "${{ github.event.inputs.url || 'https://anishgupta.eu' }}" --max-pages 100
+          EMAIL_TO:           ${{ secrets.EMAIL_TO }}
+          CLAUDE_API_KEY:     ${{ secrets.CLAUDE_API_KEY }}
+          SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python run_audit.py "${{ matrix.site }}" --max-pages 80
 
-      # Keep the HTML/JSON/MD report as a downloadable artifact of each run.
-      - uses: actions/upload-artifact@v4
+      - name: Upload report artifact
+        if: steps.gate.outputs.proceed == 'true'
+        uses: actions/upload-artifact@v4
         with:
-          name: seo-report
+          name: seo-report-${{ strategy.job-index }}
           path: reports/
           if-no-files-found: warn
