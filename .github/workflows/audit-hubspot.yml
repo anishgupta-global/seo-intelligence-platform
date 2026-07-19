@@ -1,0 +1,35 @@
+name: SEO Audit — HubSpot
+
+# Separate from audit.yml (anishgupta.eu + yoyaba.com) — this one only audits HubSpot.
+# Single cron, no time-gate: GitHub schedule delays just make it run a little later
+# rather than skipping it. 15:30 UTC = 17:30 Berlin in summer (CEST); 16:30 in winter (CET) —
+# a harmless 1-hour DST drift, traded for reliability.
+on:
+  schedule:
+    - cron: "30 15 * * *"     # ~17:30 Europe/Berlin
+  workflow_dispatch:            # manual "Run workflow" button
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run HubSpot SEO audit (emails results in live mode)
+        env:
+          EMAIL_FROM:         ${{ secrets.EMAIL_FROM }}
+          EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
+          EMAIL_TO:           ${{ secrets.EMAIL_TO }}
+          CLAUDE_API_KEY:     ${{ secrets.CLAUDE_API_KEY }}
+          SLACK_WEBHOOK_URL:  ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python run_audit.py "https://www.hubspot.com" --max-pages 60
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seo-report-hubspot
+          path: reports/
+          if-no-files-found: warn
